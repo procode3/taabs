@@ -1,8 +1,5 @@
 const tabs = await chrome.tabs.query({
-  url: [
-    'https://developer.chrome.com/docs/webstore/*',
-    'https://developer.chrome.com/docs/extensions/*',
-  ],
+  url: ['https://*/*'],
 });
 
 const collator = new Intl.Collator();
@@ -36,3 +33,33 @@ button.addEventListener('click', async () => {
     await chrome.tabGroups.update(group, { title: 'DOCS' });
   }
 });
+
+// On page load, get the current state of lazy loading from storage
+chrome.storage.local.get(['lazyLoadingEnabled'], (result) => {
+  document.getElementById('lazyLoadingToggle').checked =
+    result.lazyLoadingEnabled || false;
+});
+
+// Save the state of the checkbox when it is changed
+document
+  .getElementById('lazyLoadingToggle')
+  .addEventListener('change', function () {
+    const isEnabled = this.checked;
+
+    // Store the new state in chrome.storage.local
+    chrome.storage.local.set({ lazyLoadingEnabled: isEnabled }, () => {
+      console.log(`Lazy loading ${isEnabled ? 'enabled' : 'disabled'}`);
+    });
+
+    // Notify the background script to enable/disable lazy loading
+    chrome.runtime.sendMessage(
+      { action: 'toggle_lazy_loading', enabled: isEnabled },
+      function (response) {
+        if (chrome.runtime.lastError) {
+          console.error('Error: ', chrome.runtime.lastError.message);
+        } else {
+          console.log(response?.status);
+        }
+      }
+    );
+  });
