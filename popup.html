@@ -1,25 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="./popup.css" />
-  </head>
-  <body>
-    <template id="li_template">
-      <li>
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="./popup.css" />
+</head>
+<body>
+  <template id="li_template">
+    <li class="tabs-item">
+      <div class="tab-select">
+        <input type="checkbox" class="tab-checkbox" />
         <a>
-          <h3 class="title">Tab Title</h3>
-          <p class="pathname">Tab Pathname</p>
+          <span class="title">Tab Title</span>
+          <span class="pathname">Tab Pathname</span>
         </a>
-      </li>
-    </template>
+      </div>
+      <button class="delete-tab-btn">X</button>
+    </li>
+  </template>
+  
 
-    <h1>Taabs</h1>
-    <button>Group Tabs</button>
-    <ul></ul>
+  <header class="header">
+    <h1 class="header-title">Taabs</h1>
+    <p class="header-settings">Settings</p>
+  </header>
 
-    <script src="./popup.js" type="module"></script>
-  </body>
+  <section class="lazy-section">
+    <div class="lazy-loading">
+      <p class="lazy-loading-title">Lazy Loading</p>
+      <label class="toggle">
+        <input type="checkbox" id="lazy-loading-toggle" />
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+    
+    <div class="manage-tabs">
+      <p class="manage-tabs-title">Manage Tabs</p>
+      <div class="actions">
+        <p class="actions-title">Actions:</p>
+        <button class="group-tabs-btn group-btn">Group</button>
+        <button class="group-tabs-btn kill-btn">Kill</button>
+      </div>
+    </div>
+  </section>
+
+  <ul class="tab-list">
+    <li class="tab-item">
+        <label class="tab-checkbox">
+            <input type="checkbox" />
+            <span class="tab-name">Youtube</span>
+        </label>
+        <button class="delete-button">X</button>
+    </li>
+    <li class="tab-item">
+        <label class="tab-checkbox">
+            <input type="checkbox" />
+            <span class="tab-name">Chrome Docs</span>
+        </label>
+        <button class="delete-button">X</button>
+    </li>
+</ul>
+
+
+  <script src="./popup.js" type="module">
+  </script>
+</body>
 </html>
