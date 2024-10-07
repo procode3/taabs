@@ -1,70 +1,83 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./popup.css" />
+  </head>
 
-<head>
-  <meta charset="UTF-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="./popup.css" />
-</head>
+  <body>
+    <template id="li_template">
+      <li class="tabs-item">
+        <div class="tab-select">
+          <input type="checkbox" class="tab-checkbox" id="tab1" />
+          <label for="tab1">
+            <img
+              src="images/tabicon.png"
+              alt="Settings Icon"
+              class="tabs-icon"
+            />
+          </label>
+          <a class="tab-details">
+            <span class="title">Tab Title</span>
+            <span class="pathname">Tab Pathname</span>
+          </a>
+        </div>
+        <button class="delete-button">
+          <img src="images/x-button.png" alt="Delete Icon" class="delete-btn" />
+        </button>
+      </li>
+    </template>
 
-<body>
-  <template id="li_template">
-    <li class="tabs-item">
-      <div class="tab-select">
-        <input type="checkbox" class="tab-checkbox" id="tab1" />
-        <label for="tab1">
-          <img src="images/tabicon.png" alt="Settings Icon" class="tabs-icon" />
+    <header class="header">
+      <h1 class="header-title">Taabs</h1>
+      <div class="header-icons">
+        <img src="images/settingsicon.png" alt="Home Icon" class="home-icon" />
+        <img
+          src="images/settingsicon.png"
+          alt="Group Icon"
+          class="group-icon"
+        />
+        <img
+          src="images/settingsicon.png"
+          alt="Settings Icon"
+          class="settings-icon"
+        />
+      </div>
+    </header>
+
+    <section class="lazy-section">
+      <div class="lazy-loading">
+        <p class="lazy-loading-title">Lazy Loading</p>
+        <label class="toggle">
+          <input type="checkbox" id="lazyLoadingToggle" />
+          <span class="toggle-slider"></span>
         </label>
-        <a class="tab-details">
-          <span class="title">Tab Title</span>
-          <span class="pathname">Tab Pathname</span>
-        </a>
       </div>
-      <button class="delete-button">
-        <img src="images/x-button.png" alt="Delete Icon" class="delete-btn" />
-      </button>
-    </li>
-  </template>
 
-
-  <header class="header">
-    <h1 class="header-title">Taabs</h1>
-    <div class="header-icons">
-      <img src="images/settingsicon.png" alt="Settings Icon" class="header-icon" />
-      <img src="images/grid.png" alt="Tabs Icon" class="header-icon" />
-      <img src="images/settingsicon.png" alt="Settings Icon" class="header-icon" />
-    </div>
-  </header>
-
-
-
-  <section class="lazy-section">
-    <div class="lazy-loading">
-      <p class="lazy-loading-title">Lazy Loading</p>
-      <label class="toggle">
-        <input type="checkbox" id="lazyLoadingToggle" />
-        <span class="toggle-slider"></span>
-      </label>
-    </div>
-
-    <div class="manage-tabs">
-      <p class="manage-tabs-title">Manage Tabs</p>
-      <div class="actions">
-        <p class="actions-title">Actions:</p>
-        <button class="group-tabs-btn group-btn">Group</button>
-        <button class="group-tabs-btn kill-btn">Kill</button>
+      <div class="manage-tabs">
+        <p class="manage-tabs-title">Manage Tabs</p>
+        <div class="actions">
+          <p class="actions-title">Actions:</p>
+          <button class="group-tabs-btn group-btn">Group</button>
+          <button class="group-tabs-btn kill-btn">Kill</button>
+        </div>
       </div>
-    </div>
-  </section>
+      <div class="tabs-section">
+        <h3>Open Tabs</h3>
+        <ul class="tab-list"></ul>
+      </div>
+    </section>
 
-  <div class="tabs-section">
-    <h3>Open Tabs</h3>
-    <ul class="tab-list">
-    </ul>
-  </div>
+    <section class="group-section">
+      <h1>Manage Groups</h1>
+    </section>
 
-  <script src="./popup.js" type="module"></script>
-</body>
+    <section class="settings-section">
+      <h1>Settings</h1>
+    </section>
 
+    <script src="./popup.js" type="module"></script>
+  </body>
 </html>
