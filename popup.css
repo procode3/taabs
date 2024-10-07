@@ -96,8 +96,13 @@ body {
   text-transform: capitalize; 
 }
 
+.header-icons {
+  display: flex;
+  gap: 20px;
+}
 
-.settings-icon {
+
+.settings-icon, .home-icon, .group-icon {
   filter: brightness(1.5); 
   width: 22px;
   height: 22px;
@@ -105,7 +110,7 @@ body {
   cursor: pointer; 
 }
 
-.settings-icon:hover {
+.settings-icon:hover, .home-icon:hover, .group-icon:hover {
   filter: brightness(0) saturate(100%) invert(16%) sepia(70%) saturate(3066%) hue-rotate(217deg) brightness(90%) contrast(93%);
   width: 24px;
   height: 24px;
@@ -121,6 +126,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 20px;
+  overflow: hidden;
 }
 
 .lazy-loading {
@@ -134,7 +140,8 @@ body {
   margin-bottom: 20px; 
   border: 1px solid #ddd; 
   padding: 15px;
-  border-radius: 5px; 
+  border-radius: 5px;
+
 }
 
 .actions {
@@ -247,7 +254,8 @@ input:checked + .toggle-slider:before {
 .tab-list {
   list-style-type: none;
   padding: 0; 
-  margin: 0; 
+  margin: 0;
+  overflow-x: hidden; 
 }
 
 .tab-checkbox {
