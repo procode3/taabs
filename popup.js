@@ -29,7 +29,7 @@ for (const tab of tabs) {
 
   elements.add(element);
 }
-document.querySelector('ul').append(...elements);
+document.querySelector('.listoftabs').append(...elements);
 
 const button = document.querySelector('.group-btn');
 button.addEventListener('click', async () => {
@@ -69,3 +69,49 @@ document
       }
     );
   });
+
+// Function to display the tab groups in the listofgroups section
+async function displayTabGroups() {
+  try {
+    // Query all tab groups
+    const groups = await chrome.tabGroups.query({});
+    
+    if (!groups || groups.length === 0) {
+      console.log('No tab groups found');
+      return;
+    }
+
+    // Get the container where groups will be displayed
+    const groupContainer = document.querySelector('.listofgroups');
+    groupContainer.innerHTML = ''; // Clear the container to avoid duplicates
+
+    groups.forEach(group => {
+      // Create a new list item for each group
+      const li = document.createElement('li');
+      li.classList.add('groupelement');
+      li.textContent = group.title || `Group ${group.id}`; // Use group title or ID as fallback
+
+      // Add event listener to focus the group when clicked
+      li.addEventListener('click', async () => {
+        const tabsInGroup = await chrome.tabs.query({ groupId: group.id });
+        if (tabsInGroup.length > 0) {
+          // Focus the first tab in the group and bring the window to the foreground
+          await chrome.tabs.update(tabsInGroup[0].id, { active: true });
+          await chrome.windows.update(tabsInGroup[0].windowId, { focused: true });
+        }
+      });
+
+      // Append the group item to the container
+      groupContainer.appendChild(li);
+    });
+
+    console.log('Tab groups displayed successfully');
+  } catch (error) {
+    console.error('Error displaying tab groups:', error);
+  }
+}
+
+// Call the function to display the groups when the page loads
+displayTabGroups();
+
+
