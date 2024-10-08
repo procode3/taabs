@@ -1,5 +1,6 @@
 import { initNavigation } from './controllers/nav.js';
 import { autoGroup } from './controllers/group.js';
+import { initSearch } from './controllers/search.js';
 
 // Initialize the navigation
 initNavigation();

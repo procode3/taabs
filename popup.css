@@ -131,8 +131,7 @@ body {
 }
 
 .settings-icon:hover, .home-icon:hover, .group-icon:hover, .footer-btn:hover, .grouptabs-icon:hover, .delete-icon:hover  {
-  width: 23px;
-  height: 23px;
+  filter: brightness(0) saturate(100%) invert(16%) sepia(70%) saturate(3066%) hue-rotate(217deg) brightness(90%) contrast(93%);
   transition: transform 0.3s ease-in-out, filter 0.3s ease; 
 }
 
