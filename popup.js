@@ -31,7 +31,7 @@ for (const tab of tabs) {
 }
 document.querySelector('ul').append(...elements);
 
-const button = document.querySelector('button');
+const button = document.querySelector('.group-btn');
 button.addEventListener('click', async () => {
   const tabIds = tabs.map(({ id }) => id);
   if (tabIds.length) {
