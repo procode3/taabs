@@ -25,7 +25,7 @@ for (const tab of tabs) {
 }
 document.querySelector('ul').append(...elements);
 
-const button = document.querySelector('button');
+const button = document.querySelector('.group-btn');
 button.addEventListener('click', async () => {
   const tabIds = tabs.map(({ id }) => id);
   if (tabIds.length) {
@@ -81,7 +81,7 @@ function switchSection(sectionToShow) {
   groupSection.style.display = 'none';
   settingsSection.style.display = 'none';
 
-  sectionToShow.style.display = 'block';
+  sectionToShow.style.display = 'flex';
 }
 
 homeIcon.addEventListener('click', () => switchSection(homeSection));
