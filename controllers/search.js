@@ -1,29 +1,10 @@
-//function to search for tab
+//Function: filterTabs
 
-export const tabSearch = async () => {
-  const query = document.getElementById('search').value;
-  const tabs = await chrome.tabs.query({ title: query });
-  const elements = new Set();
-
-  for (const tab of tabs) {
-    const element = document.createElement('li');
-    element.innerHTML = `
-        <img src="${tab.favIconUrl}" alt="Favicon" />
-        <div>
-            <h2 class="title">${tab.title}</h2>
-            <p class="pathname">${tab.url}</p>
-            <a href="#">Focus Tab</a>
-        </div>
-        `;
-
-    element.querySelector('a').addEventListener('click', async () => {
-      await chrome.tabs.update(tab.id, { active: true });
-      await chrome.windows.update(tab.windowId, { focused: true });
-    });
-
-    elements.add(element);
-  }
-
-  document.querySelector('ul').innerHTML = '';
-  document.querySelector('ul').append(...elements);
-};
+export async function filterTabs(tabs, searchValue) {
+  return await tabs.filter((tab) => {
+    const title = tab.title.toLowerCase();
+    const url = tab.url.toLowerCase();
+    // Filter based on whether the tab's title or URL contains the search value
+    return title.includes(searchValue) || url.includes(searchValue);
+  });
+}
