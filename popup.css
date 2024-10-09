@@ -28,10 +28,16 @@ body {
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  border: 1px rgb(219, 219, 219) solid;
-  background: #a4a9af;
+  border: 1px #C4E4FF;
+  background: #C0D6E8;
   border-radius: 10px;
+  cursor: pointer;
 }
+
+.tabs-item:hover {
+  background-color: #C4E4FF;
+}
+
 
 .title {
   font-weight: 500;
@@ -88,7 +94,6 @@ body {
 }
 
 .tabs-icon {
-  filter: brightness(1.5); 
   width: 22px;
   height: 22px;
   transition: all 0.3s ease; 
@@ -136,8 +141,7 @@ body {
 }
 
 .settings-icon:hover, .home-icon:hover, .group-icon:hover, .footer-btn:hover, .grouptabs-icon:hover, .delete-icon:hover  {
-  width: 23px;
-  height: 23px;
+  filter: brightness(0) saturate(100%) invert(16%) sepia(70%) saturate(3066%) hue-rotate(217deg) brightness(90%) contrast(93%);
   transition: transform 0.3s ease-in-out, filter 0.3s ease; 
 }
 
@@ -245,6 +249,7 @@ input:checked + .toggle-slider:before {
 
 .tabs-section {
   max-height: 400px; 
+  max-height: 400px; 
   height: 100%;
   overflow-y: scroll; 
   border-top: 1px solid #ebebeb; 
@@ -264,7 +269,7 @@ input:checked + .toggle-slider:before {
   overflow: hidden;
 }
 
-.tab-list {
+.listoftabs {
   list-style-type: none;
   padding: 0; 
   margin: 0;
@@ -276,6 +281,12 @@ input:checked + .toggle-slider:before {
   align-items: center; 
 }
 
+.content-section {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
 .tab-checkbox input {
   margin-right: 10px; 
 }
@@ -293,7 +304,6 @@ input:checked + .toggle-slider:before {
 }
 
 .delete-btn {
-  filter: brightness(1.5); 
   width: 22px;
   height: 22px;
   transition: all 0.3s ease; 
@@ -331,7 +341,6 @@ input:checked + .toggle-slider:before {
 }
 
 .reset-icon, .update-icon {
-  filter: brightness(1.5); 
   width: 22px;
   height: 22px;
   transition: all 0.3s ease;
