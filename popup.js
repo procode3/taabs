@@ -17,7 +17,8 @@ for (const tab of tabs) {
   const element = template.content.firstElementChild.cloneNode(true);
 
   const title = tab.title.split('-')[0].trim();
-  const pathname = new URL(tab.url).pathname.slice('/docs'.length);
+  const tabUrl = new URL(tab.url);
+	const pathname = `${tabUrl.hostname}${tabUrl.pathname}`;
 
   element.querySelector('.title').textContent = title;
   element.querySelector('.pathname').textContent = pathname;
@@ -71,47 +72,102 @@ document
   });
 
 // Function to display the tab groups in the listofgroups section
+// Function to display the tab groups in the listofgroups section
 async function displayTabGroups() {
   try {
-    // Query all tab groups
-    const groups = await chrome.tabGroups.query({});
-    
-    if (!groups || groups.length === 0) {
-      console.log('No tab groups found');
-      return;
-    }
+    const tabGroups = await chrome.tabGroups.query({});
+    const template = document.getElementById("group_template");
+    const groupContainer = document.querySelector(".listofgroups");
 
-    // Get the container where groups will be displayed
-    const groupContainer = document.querySelector('.listofgroups');
-    groupContainer.innerHTML = ''; // Clear the container to avoid duplicates
+    for (const group of tabGroups) {
+      const groupElement = template.content.cloneNode(true);
+      const groupTitleElement = groupElement.querySelector(".group-title");
+      
+      // Set the group title
+      groupTitleElement.textContent = group.title || "Unnamed Group";
 
-    groups.forEach(group => {
-      // Create a new list item for each group
-      const li = document.createElement('li');
-      li.classList.add('groupelement');
-      li.textContent = group.title || `Group ${group.id}`; // Use group title or ID as fallback
+      // Add event listener to toggle the accordion
+      groupElement
+        .querySelector(".toggle-button")
+        .addEventListener("click", function () {
+          const tabsList =
+            this.closest(".group-item").querySelector(".group-tabs-list");
+          const isVisible = tabsList.style.display === "flex";
+          tabsList.style.display = isVisible ? "none" : "flex";
+          this.textContent = isVisible ? "+" : "-"; // Change button icon
+        });
 
-      // Add event listener to focus the group when clicked
-      li.addEventListener('click', async () => {
-        const tabsInGroup = await chrome.tabs.query({ groupId: group.id });
-        if (tabsInGroup.length > 0) {
-          // Focus the first tab in the group and bring the window to the foreground
-          await chrome.tabs.update(tabsInGroup[0].id, { active: true });
-          await chrome.windows.update(tabsInGroup[0].windowId, { focused: true });
+      // Add event listener for editing group title
+      groupTitleElement.addEventListener("click", function () {
+        this.contentEditable = true; // Make it editable
+        this.focus(); // Focus on the title
+      });
+
+      // Handle title change on blur (when the user clicks away) or Enter key press
+      groupTitleElement.addEventListener("blur", async function () {
+        await updateGroupTitle(group.id, this.textContent); // Save the new title
+        this.contentEditable = false; // Disable editing
+      });
+
+      groupTitleElement.addEventListener("keydown", async function (e) {
+        if (e.key === "Enter") {
+          e.preventDefault(); // Prevent new line
+          await updateGroupTitle(group.id, this.textContent); // Save the new title
+          this.contentEditable = false; // Disable editing
+          this.blur(); // Remove focus
         }
       });
 
-      // Append the group item to the container
-      groupContainer.appendChild(li);
-    });
+      // Get all tabs in the current group
+      const tabs = await chrome.tabs.query({ groupId: group.id });
+      const tabsListElement = groupElement.querySelector(".group-tabs-list");
 
-    console.log('Tab groups displayed successfully');
+      for (const tab of tabs) {
+        const tabElement = document.createElement("li");
+
+        // Apply tab-specific class for styling
+        tabElement.classList.add("tabitem");
+
+        // Set the tab title and add other details like favicon or close button
+        tabElement.innerHTML = `
+          <div class="tabcontent">
+            <div class="tabcontentcontent">
+              <img class="tabfavicon" src="${tab.favIconUrl || ""}" alt="favicon" />
+              <span class="tabtitle">${tab.title}</span>
+            </div>
+            <button class="tabclosebutton">x</button>
+          </div>
+        `;
+
+        // Optional: Add event listener to handle tab actions (e.g., close tab)
+        tabElement
+          .querySelector(".tabclosebutton")
+          .addEventListener("click", async function () {
+            await chrome.tabs.remove(tab.id); // Close the tab
+            tabElement.remove(); // Remove it from the list
+          });
+
+        tabsListElement.appendChild(tabElement);
+      }
+
+      groupContainer.appendChild(groupElement);
+    }
   } catch (error) {
-    console.error('Error displaying tab groups:', error);
+    console.error("Error displaying tab groups:", error);
   }
 }
 
-// Call the function to display the groups when the page loads
+// Function to update the group title
+async function updateGroupTitle(groupId, newTitle) {
+  try {
+    await chrome.tabGroups.update(groupId, { title: newTitle });
+    console.log(`Updated group ${groupId} to title: ${newTitle}`);
+  } catch (error) {
+    console.error("Error updating group title:", error);
+  }
+}
+
 displayTabGroups();
+
 
 
