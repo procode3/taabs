@@ -11,6 +11,7 @@ const selectedCountDisplay = document.querySelector('.selected-count'); // Eleme
 async function displayTabs(tabs) {
   const template = document.getElementById('li_template');
   const elements = new Set();
+  let checkedTabs = 0;
 
   document.querySelector('.listoftabs').innerHTML = ''; // Clear current list
 
@@ -18,7 +19,8 @@ async function displayTabs(tabs) {
     const element = template.content.firstElementChild.cloneNode(true);
 
     const title = tab.title.split('-')[0].trim();
-    const pathname = new URL(tab.url).pathname.slice('/docs'.length);
+    const path = tab.url.split('//')[1];
+    const pathname = path.includes('www') ? path.split('www.')[1] : path;
 
     element.querySelector('.title').textContent = title;
     element.querySelector('.pathname').textContent = pathname;
@@ -27,15 +29,20 @@ async function displayTabs(tabs) {
       await chrome.windows.update(tab.windowId, { focused: true });
     });
 
+    const icon = element.querySelector('.tabs-icon');
+    icon.src = tab.favIconUrl || 'images/icon-128.png';
+
     // Add event listener to the checkbox to select/unselect tabs
     const checkbox = element.querySelector('.tab-checkbox');
     checkbox.addEventListener('change', () => {
-      updateSelectedCount();
       if (checkbox.checked) {
-        selectedTabIds.add(tab.id); // Add tab ID to selected list
+        selectedTabIds.add(tab.id);
+        checkedTabs += 1; // Add tab ID to selected list
       } else {
         selectedTabIds.delete(tab.id); // Remove tab ID from selected list
+        checkedTabs -= 1;
       }
+      selectedCountDisplay.textContent = `${checkedTabs} selected`;
     });
 
     // Close tab when 'X' button is clicked
@@ -43,13 +50,13 @@ async function displayTabs(tabs) {
     deleteButton.addEventListener('click', async () => {
       await chrome.tabs.remove(tab.id); // Close the tab
       element.remove(); // Remove the tab element from the DOM
+      //refresh the count of selected tabs
     });
 
     elements.add(element);
   }
 
   document.querySelector('.listoftabs').append(...elements);
-  updateSelectedCount();
 }
 
 // Query all tabs initially
@@ -76,8 +83,10 @@ searchInput.addEventListener('input', () => {
   clearTimeout(debounceTimeout);
   debounceTimeout = setTimeout(async () => {
     const filteredTabs = await filterTabs(tabs, searchValue);
+    //reset the selected tabs
+    selectedCountDisplay.textContent = '0 selected';
     await displayTabs(filteredTabs);
-  }, 400); // Adjust the debounce delay if needed
+  }, 400);
 });
 
 // Add event listener for the "Close Selected Tabs" button
@@ -91,17 +100,14 @@ closeSelectedButton.addEventListener('click', async () => {
     // Filter out the closed tabs from the list
     tabs = tabs.filter((tab) => !tabIdsToClose.includes(tab.id));
     selectedTabIds.clear(); // Clear the selection after closing
-
-    displayTabs(tabs);
-    // Refresh the tabs list
+    selectedCountDisplay.textContent = '0 selected'; // Reset the count
+    const searchValue = searchInput.value.toLowerCase();
+    const filteredTabs = await filterTabs(tabs, searchValue);
+    await displayTabs(filteredTabs);
   }
 });
 
 // Function to update the displayed count of selected tabs
-function updateSelectedCount() {
-  console.log(selectedTabIds.size);
-  selectedCountDisplay.textContent = `${selectedTabIds.size} selected`;
-}
 
 const button = document.querySelector('.group-btn');
 button.addEventListener('click', async () => {
@@ -148,41 +154,41 @@ document
 async function displayTabGroups() {
   try {
     const tabGroups = await chrome.tabGroups.query({});
-    const template = document.getElementById("group_template");
-    const groupContainer = document.querySelector(".listofgroups");
+    const template = document.getElementById('group_template');
+    const groupContainer = document.querySelector('.listofgroups');
 
     for (const group of tabGroups) {
       const groupElement = template.content.cloneNode(true);
-      const groupTitleElement = groupElement.querySelector(".group-title");
-      
+      const groupTitleElement = groupElement.querySelector('.group-title');
+
       // Set the group title
-      groupTitleElement.textContent = group.title || "Unnamed Group";
+      groupTitleElement.textContent = group.title || 'Unnamed Group';
 
       // Add event listener to toggle the accordion
       groupElement
-        .querySelector(".toggle-button")
-        .addEventListener("click", function () {
+        .querySelector('.toggle-button')
+        .addEventListener('click', function () {
           const tabsList =
-            this.closest(".group-item").querySelector(".group-tabs-list");
-          const isVisible = tabsList.style.display === "flex";
-          tabsList.style.display = isVisible ? "none" : "flex";
-          this.textContent = isVisible ? "+" : "-"; // Change button icon
+            this.closest('.group-item').querySelector('.group-tabs-list');
+          const isVisible = tabsList.style.display === 'flex';
+          tabsList.style.display = isVisible ? 'none' : 'flex';
+          this.textContent = isVisible ? '+' : '-'; // Change button icon
         });
 
       // Add event listener for editing group title
-      groupTitleElement.addEventListener("click", function () {
+      groupTitleElement.addEventListener('click', function () {
         this.contentEditable = true; // Make it editable
         this.focus(); // Focus on the title
       });
 
       // Handle title change on blur (when the user clicks away) or Enter key press
-      groupTitleElement.addEventListener("blur", async function () {
+      groupTitleElement.addEventListener('blur', async function () {
         await updateGroupTitle(group.id, this.textContent); // Save the new title
         this.contentEditable = false; // Disable editing
       });
 
-      groupTitleElement.addEventListener("keydown", async function (e) {
-        if (e.key === "Enter") {
+      groupTitleElement.addEventListener('keydown', async function (e) {
+        if (e.key === 'Enter') {
           e.preventDefault(); // Prevent new line
           await updateGroupTitle(group.id, this.textContent); // Save the new title
           this.contentEditable = false; // Disable editing
@@ -192,19 +198,21 @@ async function displayTabGroups() {
 
       // Get all tabs in the current group
       const tabs = await chrome.tabs.query({ groupId: group.id });
-      const tabsListElement = groupElement.querySelector(".group-tabs-list");
+      const tabsListElement = groupElement.querySelector('.group-tabs-list');
 
       for (const tab of tabs) {
-        const tabElement = document.createElement("li");
+        const tabElement = document.createElement('li');
 
         // Apply tab-specific class for styling
-        tabElement.classList.add("tabitem");
+        tabElement.classList.add('tabitem');
 
         // Set the tab title and add other details like favicon or close button
         tabElement.innerHTML = `
           <div class="tabcontent">
             <div class="tabcontentcontent">
-              <img class="tabfavicon" src="${tab.favIconUrl || ""}" alt="favicon" />
+              <img class="tabfavicon" src="${
+                tab.favIconUrl || ''
+              }" alt="favicon" />
               <span class="tabtitle">${tab.title}</span>
             </div>
             <button class="tabclosebutton">x</button>
@@ -213,8 +221,8 @@ async function displayTabGroups() {
 
         // Optional: Add event listener to handle tab actions (e.g., close tab)
         tabElement
-          .querySelector(".tabclosebutton")
-          .addEventListener("click", async function () {
+          .querySelector('.tabclosebutton')
+          .addEventListener('click', async function () {
             await chrome.tabs.remove(tab.id); // Close the tab
             tabElement.remove(); // Remove it from the list
           });
@@ -225,7 +233,7 @@ async function displayTabGroups() {
       groupContainer.appendChild(groupElement);
     }
   } catch (error) {
-    console.error("Error displaying tab groups:", error);
+    console.error('Error displaying tab groups:', error);
   }
 }
 
@@ -235,9 +243,8 @@ async function updateGroupTitle(groupId, newTitle) {
     await chrome.tabGroups.update(groupId, { title: newTitle });
     console.log(`Updated group ${groupId} to title: ${newTitle}`);
   } catch (error) {
-    console.error("Error updating group title:", error);
+    console.error('Error updating group title:', error);
   }
 }
 
 displayTabGroups();
-
