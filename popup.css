@@ -381,12 +381,12 @@ footer {
 
 
 .group-title {
-  cursor: pointer; /* Change cursor to pointer on hover */
+  cursor: pointer; /
 }
 
 .group-title:focus {
-  outline: none; /* Remove the default focus outline */
-  border-bottom: 1px solid #007bff; /* Add a bottom border to indicate focus */
+  outline: none; 
+  border-bottom: 1px solid #090b0c; 
 }
 
 
@@ -438,7 +438,6 @@ footer {
 }
 
 
-/* Style the individual tab items */
 .tabitem {
   display: flex;
   align-items: center;
@@ -449,7 +448,6 @@ footer {
   transition: background-color 0.2s ease;
 }
 
-/* Style for tab content (favicon, title) */
 .tabcontent {
   display: flex;
   align-items: center;
@@ -462,14 +460,13 @@ display: flex;
 align-items: center;
 gap: 5px;
 }
-/* Favicon styling */
+
 .tabfavicon {
   width: 16px;
   height: 16px;
   border-radius: 2px;
 }
 
-/* Tab title styling */
 .tabtitle {
   flex-grow: 1;
  white-space: nowrap;       
@@ -478,7 +475,7 @@ gap: 5px;
   max-width: 200px;
 }
 
-/* Close button styling */
+
 .tabclosebutton {
   background-color: transparent;
   border: none;
@@ -491,13 +488,14 @@ gap: 5px;
   color: #ff0000;
 }
 
-/* Hover effect for tabs */
 .tabitem:hover {
   background-color: #C0D6E8;
 }
 
 
-
+.group-item.drag-over {
+  background-color: rgba(0, 128, 255, 0.1); 
+}
 
 ::-webkit-scrollbar {
     width: 5px; 
