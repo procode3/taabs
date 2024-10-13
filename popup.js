@@ -181,7 +181,6 @@ async function displayTabGroups() {
   }
 }
 
-
 async function createGroupElement(group, template) {
 	if (!template) {
 		console.error("Template not found");
@@ -191,6 +190,7 @@ async function createGroupElement(group, template) {
 	const groupElement = template.content.cloneNode(true);
 	const groupTitleElement = groupElement.querySelector(".group-title");
 	const tabsListElement = groupElement.querySelector(".group-tabs-list");
+	const editIcon = groupElement.querySelector(".group-edit-img"); // Get the edit icon
 
 	if (!groupTitleElement || !tabsListElement) {
 		console.error("Group title or tabs list element not found");
@@ -201,23 +201,22 @@ async function createGroupElement(group, template) {
 	groupTitleElement.textContent = group.title || "Unnamed Group";
 	tabsListElement.dataset.groupId = group.id;
 
-      // Add event listener to toggle the accordion
-      groupElement
-        .querySelector('.toggle-button')
-        .addEventListener('click', function () {
-          const tabsList =
-            this.closest('.group-item').querySelector('.group-tabs-list');
-          const isVisible = tabsList.style.display === 'flex';
-          tabsList.style.display = isVisible ? 'none' : 'flex';
-          this.textContent = isVisible ? '+' : '-'; // Change button icon
-        });
+	// Add event listener to toggle the accordion
+	groupElement
+		.querySelector(".toggle-button")
+		.addEventListener("click", function () {
+			const tabsList =
+				this.closest(".group-item").querySelector(".group-tabs-list");
+			const isVisible = tabsList.style.display === "flex";
+			tabsList.style.display = isVisible ? "none" : "flex";
+			this.textContent = isVisible ? "+" : "-"; // Change button icon
+		});
 
-	// Add event listener for editing group title
-	groupTitleElement.addEventListener("click", function () {
-		this.contentEditable = true;
-		this.focus();
+	// Event listener for editing group title
+	editIcon.addEventListener("click", function () {
+		groupTitleElement.contentEditable = true;
+		groupTitleElement.focus();
 	});
-     
 
 	groupTitleElement.addEventListener("blur", async function () {
 		await updateGroupTitle(group.id, this.textContent);
@@ -245,8 +244,22 @@ async function createGroupElement(group, template) {
 	tabsListElement.addEventListener("dragover", allowDrop);
 	tabsListElement.addEventListener("drop", drop);
 
+	// Add hover effect for edit icon visibility
+	groupElement
+		.querySelector(".group-item")
+		.addEventListener("mouseenter", () => {
+			editIcon.style.display = "inline"; // Show edit icon on hover
+		});
+
+	groupElement
+		.querySelector(".group-item")
+		.addEventListener("mouseleave", () => {
+			editIcon.style.display = "none"; // Hide edit icon when not hovering
+		});
+
 	return groupElement.firstElementChild; // Return the actual element
 }
+
 
 
 function createTabElement(tab) {
@@ -341,3 +354,51 @@ async function updateGroupTitle(groupId, newTitle) {
 
 // Make sure to call displayTabGroups() when your popup loads
 displayTabGroups();
+
+
+
+// Select the buttons by their IDs
+const addGroupButton = document.getElementById('add-group-button');
+const deleteSelectedButton = document.getElementById('delete-selected-button');
+
+// Function to add a new, empty group
+function addGroup() {
+    // Create a new group element
+    const newGroup = document.createElement('div');
+    newGroup.className = 'group'; // Add the same class as other groups
+    
+    // Create a group title
+    const groupTitle = document.createElement('div');
+    groupTitle.className = 'group-title';
+    groupTitle.textContent = `New Group ${document.querySelectorAll('.group').length + 1}`;
+    
+    // Create a container for tabs (assuming groups hold tabs or content)
+    const tabsContainer = document.createElement('div');
+    tabsContainer.className = 'tabs';
+    tabsContainer.textContent = 'No tabs yet'; // This could be empty, but here for visibility
+    
+    // Append the title and tabs container to the group
+    newGroup.appendChild(groupTitle);
+    newGroup.appendChild(tabsContainer);
+    
+    // Append the new group to the group container (adjust this to your actual container)
+    const groupContainer = document.getElementById('group-container'); // Replace with your container's ID
+    groupContainer.appendChild(newGroup);
+    
+    alert('New empty group added!');
+}
+
+// Function to delete the selected group
+function deleteSelectedGroup() {
+    const selectedGroup = document.querySelector('.group.selected'); // Assuming selected groups have a "selected" class
+    if (selectedGroup) {
+        selectedGroup.remove();
+        alert('Selected group deleted!');
+    } else {
+        alert('No group selected to delete.');
+    }
+}
+
+// Attach event listeners to the buttons
+addGroupButton.addEventListener('click', addGroup);
+deleteSelectedButton.addEventListener('click', deleteSelectedGroup);
