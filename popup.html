@@ -1,171 +1,140 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="./popup.css" />
-  </head>
 
-  <body>
-    <template id="li_template">
-      <li class="tabelement">
-        <input type="checkbox" class="tab-checkbox" id="tab1" />
-        <div class="tabs-item">
-          <div class="tab-select">
-            <label for="tab1">
-              <img
-                src="images/chrome.png"
-                alt="Settings Icon"
-                class="tabs-icon"
-              />
-            </label>
-            <a class="tab-details">
-              <span class="title">Tab Title</span>
-              <span class="pathname">Tab Pathname</span>
-            </a>
-          </div>
-          <button class="delete-button">
-            <img
-              src="images/x-button.svg"
-              alt="Delete Icon"
-              class="delete-btn"
-            />
-          </button>
-        </div>
-      </li>
-    </template>
-    <template id="group_template">
-      <li class="groupelement">
-        <input type="checkbox" class="group-checkbox" id="grouptabs" />
-        <div class="group-item">
-          <div class="group-header">
-            <span class="group-title" contenteditable="false" spellcheck="false">Group Title</span> <!-- Made editable -->
-            <button class="toggle-button">+</button>
-          </div>
-          <ul class="group-tabs-list" style="display: none;">
-            <!-- Tabs inside the group will go here -->
-          </ul>
-        </div>
-      </li>
-    </template>
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="./popup.css" />
+</head>
 
-    <header class="header">
-      <h1 class="header-title">Taabs</h1>
-      <div class="header-icons">
-        <img src="images/homeicon.png" alt="Home Icon" class="home-icon" />
-        <img src="images/gridicon.png" alt="Group Icon" class="group-icon" />
-        <img
-          src="images/settingsicon.png"
-          alt="Settings Icon"
-          class="settings-icon"
-        />
+<body>
+  <template id="li_template">
+    <li class="tabelement">
+      <input type="checkbox" class="tab-checkbox" id="tab1" />
+      <div class="tabs-item">
+        <div class="tab-select">
+          <label for="tab1">
+            <img src="images/chrome.png" alt="Settings Icon" class="tabs-icon" />
+          </label>
+          <a class="tab-details">
+            <span class="title">Tab Title</span>
+            <span class="pathname">Tab Pathname</span>
+          </a>
+        </div>
+        <button class="delete-button">
+          <img src="images/x-button.svg" alt="Delete Icon" title="Delete" class="delete-btn" />
+        </button>
       </div>
-    </header>
-    <div class="content-section">
-      <section class="lazy-section">
-        <div class="lazy-loading">
-          <p class="lazy-loading-title">Lazy Loading</p>
-          <label class="toggle">
-            <input type="checkbox" id="lazyLoadingToggle" />
-            <span class="toggle-slider"></span>
-          </label>
-        </div>
-        <div class="manage-tabs">
-          <p class="manage-tabs-title">Manage Tabs</p>
-          <div class="actions">
-            <p class="selected-count">0 selected</p>
-            <div>
-              <input
-                type="text"
-                placeholder="Search Tabs..."
-                class="tab-input"
-              />
-            </div>
-            <!-- <button class="group-tabs-btn group-btn">Group</button>
-    <button class="group-tabs-btn kill-btn">Kill</button> -->
-            <img
-              src="images/folder-input.svg"
-              alt="Auto group Icon"
-              class="grouptabs-icon group-btn"
-            />
-            <img
-              src="images/deleteicon.png"
-              alt="Delete Tabs Icon"
-              class="delete-icon"
-            />
+    </li>
+  </template>
+  <template id="group_template">
+    <li class="groupelement">
+      <input type="checkbox" class="group-checkbox" id="grouptabs" />
+      <div class="group-item">
+        <div class="group-header">
+          <div class="group-name">
+            <span class="group-title" contenteditable="false" spellcheck="false">Group Title</span>
+            <img src="images/pen.png" alt="Edit group name Icon" class="group-edit-img" />
           </div>
+          <button class="toggle-button">+</button>
         </div>
-        <div class="open-tabs">
-          <!-- <h3>Open Tabs - (10)</h3> -->
-          <div class="tabs-section">
-            <ul class="listoftabs"></ul>
-          </div>
-        </div>
-      </section>
+        <ul class="group-tabs-list" style="display: none;">
+          <!-- Tabs inside the group will go here -->
+        </ul>
+      </div>
+    </li>
+  </template>
 
-      <section class="group-section">
-        <div class="manage-tabs">
-          <p class="manage-tabs-title">Manage Group</p>
-          <div class="actions">
-            <p class="actions-title">0 Selected</p>
-            <div>
-              <input
-                type="text"
-                placeholder="Search Tabs..."
-                class="tab-input"
-              />
-            </div>
-            <!-- <button class="group-tabs-btn group-btn">Group</button>
-    <button class="group-tabs-btn kill-btn">Kill</button> -->
-            <img
-              src="images/folder-plus.png"
-              alt="Add to groups Icon"
-              class="grouptabs-icon"
-            />
-            <img
-              src="images/deleteicon.png"
-              alt="Delete group Icon"
-              class="delete-icon"
-            />
-          </div>
-        </div>
-        <div class="tabs-section">
-          <ul class="listofgroups tab-list">
-  <ul class="listofgroups tab-list">
-  
-</ul>
-
-
-        </div>
-      </section>
-
-      <section class="settings-section">
-        <h2>Settings</h2>
-        <div class="settings-item">
-          <img src="images/reset.svg" alt="Home Icon" class="reset-icon" />
-          <button>Reset Defaults</button>
-        </div>
-        <div class="settings-item">
-          <img src="images/update.svg" alt="Home Icon" class="update-icon" />
-          <p>Auto Update</p>
-          <label class="toggle">
-            <input type="checkbox" id="autoUpdate" />
-            <span class="toggle-slider"></span>
-          </label>
-        </div>
-      </section>
-
-      <footer>
-        <p>Terms of Service and Privacy Policy</p>
-        <img
-          src="images/external-link.png"
-          alt="Home Icon"
-          class="tabs-icon footer-btn"
-        />
-      </footer>
+  <header class="header">
+    <h1 class="header-title">Taabs</h1>
+    <div class="header-icons">
+      <img src="images/homeicon.png" alt="Home Icon" class="home-icon" title="Home" />
+      <img src="images/gridicon.png" alt="Group Icon" class="group-icon" title="Groups" />
+      <img src="images/settingsicon.png" alt="Settings Icon" class="settings-icon" title="Settings" />
     </div>
+  </header>
+  <div class="content-section">
+    <section class="lazy-section">
+      <div class="lazy-loading">
+        <div>
+          <p class="lazy-loading-title">Lazy Loading</p>
+          <p class="lazy-loading-description">Load tabs only when active to save resources and improve speed.</p>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="lazyLoadingToggle" />
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+      <div class="manage-tabs">
+        <p class="manage-tabs-title">Manage Tabs</p>
+        <div class="actions">
+          <p class="selected-count">0 selected</p>
+          <div>
+            <input type="text" placeholder="Search Tabs..." class="tab-input" />
+          </div>
+          <!-- <button class="group-tabs-btn group-btn">Group</button>
+    <button class="group-tabs-btn kill-btn">Kill</button> -->
+          <img src="images/folder-input.svg" alt="Auto group Icon" title="Group Tabs"
+            class="grouptabs-icon group-btn" />
+          <img src="images/deleteicon.png" alt="Delete Tabs Icon" title="Delete Selected Tabs" class="delete-icon" />
+        </div>
+      </div>
+      <div class="open-tabs">
+        <!-- <h3>Open Tabs - (10)</h3> -->
+        <div class="tabs-section">
+          <ul class="listoftabs"></ul>
+        </div>
+      </div>
+    </section>
 
-    <script src="./popup.js" type="module"></script>
-  </body>
+    <section class="group-section">
+      <div class="manage-tabs">
+        <p class="manage-tabs-title">Manage Group</p>
+        <div class="actions">
+          <p class="actions-title">0 Selected</p>
+          <div>
+            <input type="text" placeholder="Search Tabs..." class="tab-input" />
+          </div>
+          <img src="images/folder-plus.png" alt="Add to groups Icon" title="Add Group" class="grouptabs-icon"
+            id="add-group-button" />
+          <img src="images/deleteicon.png" alt="Delete group Icon" title="Delete Selected Group" class="delete-icon"
+            id="delete-selected-button" />
+        </div>
+      </div>
+      <div class="tabs-section">
+        <ul class="listofgroups tab-list">
+          <!-- Dynamically populated groups will go here -->
+        </ul>
+      </div>
+    </section>
+
+    <section class="settings-section">
+      <h2>Settings</h2>
+      <div class="settings-item">
+        <img src="images/reset.svg" alt="Home Icon" class="reset-icon" />
+        <button>Reset Defaults</button>
+      </div>
+      <div class="settings-item">
+        <img src="images/update.svg" alt="Home Icon" class="update-icon" />
+        <p>Auto Update</p>
+        <label class="toggle">
+          <input type="checkbox" id="autoUpdate" />
+          <span class="toggle-slider"></span>
+        </label>
+      </div>
+    </section>
+
+    <footer>
+      <p>Terms of Service and Privacy Policy</p>
+      <a href="https://github.com/procode3/taabs/blob/main/README.md" target="_blank">
+        <img src="images/external-link.png" alt="Terms of Service" class="footer-btn" />
+      </a>
+    </footer>
+
+  </div>
+
+  <script src="./popup.js" type="module"></script>
+</body>
+
 </html>

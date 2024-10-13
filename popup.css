@@ -41,6 +41,10 @@ body {
 
 .title {
   font-weight: 500;
+  white-space: nowrap;       
+  overflow: hidden;           
+  text-overflow: ellipsis;    
+  max-width: 200px; 
 }
 
 .tabelement {
@@ -101,7 +105,7 @@ body {
 }
 
 .header {
-  background-color: #ffffff; 
+  background-color: #172554; 
   padding: 20px 20px;
   text-align: center;
   display: flex;
@@ -114,8 +118,8 @@ body {
 
 .header-title {
   font-size: clamp(2em, 5vw, 3em);
+  color: white;
   font-weight: 700;
-  color: #222; 
   letter-spacing: -0.05rem; 
   line-height: 1.2; 
   text-transform: capitalize; 
@@ -124,6 +128,7 @@ body {
 .header-icons {
   display: flex;
   gap: 20px;
+   filter: brightness(0) invert(1);
 }
 
 .content-section {
@@ -134,8 +139,8 @@ body {
 }
 
 .settings-icon, .home-icon, .group-icon, .footer-btn, .grouptabs-icon, .delete-icon {
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
   transition: all 0.3s ease;
   cursor: pointer; 
 }
@@ -148,11 +153,11 @@ body {
 
 
 .lazy-section, .settings-section {
-  padding: 20px 20px;
+  padding: 10px 20px;
   background-color: #ffffff;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 10px;
   overflow: hidden;
 }
 
@@ -238,6 +243,11 @@ body {
   transition: transform 0.3s, background-color 0.3s; 
 }
 
+.lazy-loading-description {
+  font-size: 10px;
+  color: #666;
+}
+
 input:checked + .toggle-slider {
   background-color: #172554; 
 }
@@ -248,8 +258,7 @@ input:checked + .toggle-slider:before {
 }
 
 .tabs-section {
-  max-height: 400px; 
-  max-height: 400px; 
+  max-height: 300px; 
   height: 100%;
   overflow-y: scroll; 
   border-top: 1px solid #ebebeb; 
@@ -368,11 +377,13 @@ footer {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 10px;
-  gap: 10px;
+  margin-bottom: 5px;
+  gap: 5px;
 }
 .footer-btn {
   display: flex;
+  height: 14px;
+  width: 14px;
   align-items: center;
   justify-content: center;
   margin: 10px;
@@ -398,6 +409,7 @@ footer {
 }
 
 .group-item {
+  position: relative;
   width: 100%;
   margin-bottom: 10px;
   border: 1px solid #ccc;
@@ -495,6 +507,26 @@ gap: 5px;
 
 .group-item.drag-over {
   background-color: rgba(0, 128, 255, 0.1); 
+}
+
+.group-edit-img {
+   width: 14px;
+  height: 14px;
+  transition: all 0.3s ease; 
+  cursor: pointer; 
+  transform: rotate(-15deg);
+   display: none;
+}
+
+.group-item:hover .group-edit-img {
+  display: inline; /* Show when hovering over the group item */
+}
+
+.group-name {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 3px;
 }
 
 ::-webkit-scrollbar {
