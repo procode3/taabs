@@ -406,23 +406,20 @@ footer {
   display: flex;
   flex-direction: row;
   gap: 5px;
+  margin: 5px 0px;
 }
 
 .group-item {
   position: relative;
   width: 100%;
-  margin-bottom: 10px;
+  margin: 5px 0;
   border: 1px solid #ccc;
-  border-radius: 10px;
+  border-radius: 4px;
   padding: 10px;
   background: #C0D6E8;
 }
 
 .group-item:hover {
-  margin-bottom: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  padding: 10px;
   background: #C4E4FF;
 }
 
@@ -440,13 +437,17 @@ footer {
   margin-top: 10px;
   list-style: none;
   padding-left: 20px;
+  transition: max-height 0.5s ease-in-out;
+  overflow: hidden;
+  max-height: 300px; 
 }
 
 .toggle-button {
   background-color: transparent;
   border: none;
-  font-size: 18px;
+  font-size: 22px;
   cursor: pointer;
+
 }
 
 
@@ -510,18 +511,23 @@ gap: 5px;
 }
 
 .group-edit-img {
-   width: 14px;
-  height: 14px;
-  transition: all 0.3s ease; 
+  width: 12px;
+  height: 12px;
+  transition: all 0.2s ease; 
   cursor: pointer; 
-  transform: rotate(-15deg);
-   display: none;
+  transform: rotate(0deg);
+  display: none;
+  margin: 0px 10px;
+
 }
 
 .group-item:hover .group-edit-img {
   display: inline; /* Show when hovering over the group item */
 }
 
+.group-edit-img:hover {
+  transform: rotate(-15deg); 
+}
 .group-name {
   display: flex;
   flex-direction: row;
