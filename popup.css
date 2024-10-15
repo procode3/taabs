@@ -336,7 +336,7 @@ input:checked + .toggle-slider:before {
   color: white; 
   border: none;
   padding: 7px 10px;
-  width: 120px;
+  width: 130px;
   border-radius: 5px;
   cursor: pointer;
   font-size: 1 rem;
@@ -403,6 +403,7 @@ footer {
 }
 
 .tabs-count {
+  text-align: left;
   flex-shrink: 0; 
   margin-right: 100px; 
 }

@@ -25,3 +25,16 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   // Return true to indicate an async response
   return true;
 });
+
+//clear chrome storage
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === 'clear_storage') {
+    chrome.storage.local.set({ lazyLoadingEnabled: false }, () => {
+      console.log('Storage cleared');
+      sendResponse({ status: 'Chrome storage cleared' });
+    });
+  }
+
+  // Return true to indicate an async response
+  return true;
+});

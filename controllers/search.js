@@ -1,5 +1,4 @@
 //Function: filterTabs
-
 export async function filterTabs(tabs, searchValue) {
   try {
     return await tabs.filter((tab) => {

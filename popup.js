@@ -3,16 +3,13 @@ import { initNavigation } from './controllers/nav.js';
 import {
   displayTabGroups,
   deleteSelectedGroup,
-  createGroupElement,
   autoGroup,
   addGroup,
 } from './controllers/group.js';
 
-import {
-  filterTabs,
-  searchRecentlyClosedTabs,
-  searchBookmarks,
-} from './controllers/search.js';
+import { filterTabs } from './controllers/search.js';
+
+import { displayTabs } from './controllers/tab.js';
 
 // Initialize the navigation
 initNavigation();
@@ -20,58 +17,6 @@ initNavigation();
 let selectedTabIds = new Set(); // Store selected tab IDs
 let selectedGroupIds = new Set(); // Store selected group IDs
 const selectedCountDisplay = document.querySelector('.selected-count'); // Element to display the count
-
-async function displayTabs(tabs) {
-  const template = document.getElementById('li_template');
-  const elements = new Set();
-  let checkedTabs = 0;
-
-  document.querySelector('.listoftabs').innerHTML = ''; // Clear current list
-
-  for (const tab of tabs) {
-    const element = template.content.firstElementChild.cloneNode(true);
-
-    const title = tab.title.split('-')[0].trim();
-    const path = tab.url.split('//')[1];
-    const pathname = path.includes('www') ? path.split('www.')[1] : path;
-
-    element.querySelector('.title').textContent = title;
-    element.querySelector('.pathname').textContent = pathname;
-    element.querySelector('a').addEventListener('click', async () => {
-      await chrome.tabs.update(tab.id, { active: true });
-      await chrome.windows.update(tab.windowId, { focused: true });
-    });
-
-    const icon = element.querySelector('.tabs-icon');
-    icon.src = tab.favIconUrl || 'images/icon-128.png';
-    // Add event listener to the checkbox to select/unselect tabs
-    const checkbox = element.querySelector('.tab-checkbox');
-    checkbox.addEventListener('change', () => {
-      if (checkbox.checked) {
-        selectedTabIds.add(tab.id);
-        checkedTabs += 1; // Add tab ID to selected list
-      } else {
-        selectedTabIds.delete(tab.id); // Remove tab ID from selected list
-        checkedTabs -= 1;
-      }
-      selectedCountDisplay.textContent = `${checkedTabs} selected`;
-    });
-    selectedCountDisplay.textContent = `${checkedTabs} selected`;
-    // Close tab when 'X' button is clicked
-    const deleteButton = element.querySelector('.delete-button');
-    deleteButton.addEventListener('click', async () => {
-      await chrome.tabs.remove(tab.id); // Close the tab
-      element.remove(); // Remove the tab element from the DOM
-      //refresh the count of selected tabs
-    });
-
-    elements.add(element);
-  }
-
-  document.querySelector('.listoftabs').append(...elements);
-  document.querySelector('.listoftabs').append(...elements);
-  updateSelectedCount();
-}
 
 // Query all tabs initially
 let tabs = await chrome.tabs.query({
@@ -83,7 +28,7 @@ const collator = new Intl.Collator();
 tabs.sort((a, b) => collator.compare(a.title, b.title));
 
 // Display all tabs initially
-displayTabs(tabs);
+displayTabs(tabs, selectedTabIds);
 
 // Search functionality
 const searchInput = document.querySelector('.tab-input');
@@ -93,48 +38,38 @@ let debounceTimeout;
 searchInput.addEventListener('input', () => {
   const searchValue = searchInput.value.toLowerCase();
 
-  // Debounce logic: only execute search after user stops typing for 300ms
+  // Debounce logic: clear timeout before setting a new one
   clearTimeout(debounceTimeout);
   debounceTimeout = setTimeout(async () => {
     const filteredTabs = await filterTabs(tabs, searchValue);
-    const bookmarks = await searchBookmarks(searchValue);
-    const recentTabs = await searchRecentlyClosedTabs(searchValue);
-
-    await displayTabs(filteredTabs);
-  }, 400); // Adjust the debounce delay if needed
+    await displayTabs(filteredTabs, selectedTabIds);
+  }, 400);
 });
 
 // Add event listener for the "Close Selected Tabs" button
 const closeSelectedButton = document.querySelector('.delete-icon');
 closeSelectedButton.addEventListener('click', async () => {
   if (selectedTabIds.size > 0) {
-    // Convert Set to array and close all selected tabs
     const tabIdsToClose = Array.from(selectedTabIds);
-    await chrome.tabs.remove(tabIdsToClose); // Close selected tabs
+    await chrome.tabs.remove(tabIdsToClose);
 
     // Filter out the closed tabs from the list
     tabs = tabs.filter((tab) => !tabIdsToClose.includes(tab.id));
-    selectedTabIds.clear(); // Clear the selection after closing
-    selectedCountDisplay.textContent = '0 selected'; // Reset the count
+    selectedTabIds.clear();
+    selectedCountDisplay.textContent = '0 selected';
     const searchValue = searchInput.value.toLowerCase();
     const filteredTabs = await filterTabs(tabs, searchValue);
-    await displayTabs(filteredTabs);
+    await displayTabs(filteredTabs, selectedTabIds);
   }
   // Filter out the closed tabs from the list
   tabs = tabs.filter((tab) => !tabIdsToClose.includes(tab.id));
-  selectedTabIds.clear(); // Clear the selection after closing
+  selectedTabIds.clear();
 
-  displayTabs(tabs);
-  // Refresh the tabs list
+  displayTabs(tabs, selectedTabIds);
 });
 
-// Function to update the displayed count of selected tabs
-function updateSelectedCount() {
-  selectedCountDisplay.textContent = `${selectedTabIds.size} selected`;
-}
-
 const button = document.querySelector('.group-btn');
-button.addEventListener('click', autoGroup);
+button.addEventListener('click', () => autoGroup(selectedGroupIds));
 
 // On page load, get the current state of lazy loading from storage
 chrome.storage.local.get(['lazyLoadingEnabled'], (result) => {
@@ -142,7 +77,6 @@ chrome.storage.local.get(['lazyLoadingEnabled'], (result) => {
     result.lazyLoadingEnabled || false;
 });
 
-// Save the state of the checkbox when it is changed
 document
   .getElementById('lazyLoadingToggle')
   .addEventListener('change', function () {
@@ -166,16 +100,35 @@ document
     );
   });
 
-// Make sure to call displayTabGroups() when your popup loads
 displayTabGroups(selectedGroupIds);
 
 const addGroupButton = document.getElementById('add-group-button');
 const deleteSelectedButton = document.getElementById('delete-selected-button');
-
-// Function to add a new, empty group
 
 // Attach event listeners to the buttons
 addGroupButton.addEventListener('click', () => addGroup(selectedGroupIds));
 deleteSelectedButton.addEventListener('click', () =>
   deleteSelectedGroup(selectedGroupIds)
 );
+
+//reset the chrome storage
+const resetButton = document.querySelector('.reset');
+resetButton.addEventListener('click', () => {
+  // Send a message to the background script to clear the storage
+  chrome.runtime.sendMessage({ action: 'clear_storage' }, (response) => {
+    if (response.status === 'Chrome storage cleared') {
+      //turn off checkbox
+      document.getElementById('lazyLoadingToggle').checked = false;
+    }
+  });
+});
+
+const mergeWindowsButton = document.querySelector('.merge');
+
+mergeWindowsButton.addEventListener('click', () => {
+  chrome.windows.getAll({ populate: true }, (windows) => {
+    const tabs = windows.flatMap((window) => window.tabs);
+    const tabIds = tabs.map((tab) => tab.id);
+    chrome.tabs.remove(tabIds);
+  });
+});

@@ -18,7 +18,7 @@ export async function deleteSelectedGroup(selectedGroupIds) {
   }
 }
 
-// Function
+// Function to display all tab groups
 export async function displayTabGroups(selectedGroupIds, openedGroupId = []) {
   try {
     let selectedGroupsCount = 0;
@@ -56,106 +56,111 @@ export async function displayTabGroups(selectedGroupIds, openedGroupId = []) {
 
       groupContainer.appendChild(groupElement);
     }
-    print('groupContainer', groupContainer);
   } catch (error) {
     console.error('Error displaying tab groups:', error);
   }
 }
 
+// Function to create a group element
 export async function createGroupElement(group, template, selectedGroupIds) {
   if (!template) {
     console.error('Template not found');
     return null; // Exit if the template is not found
   }
 
-  const tabs = await chrome.tabs.query({ groupId: group.id });
+  try {
+    const tabs = await chrome.tabs.query({ groupId: group.id });
 
-  const groupElement = template.content.cloneNode(true);
-  const groupItem = groupElement.querySelector('.groupelement');
-  groupItem.addEventListener('dragover', dragOverGroup);
-  groupItem.addEventListener('dragleave', dragLeaveGroup);
-  const groupTitleElement = groupElement.querySelector('.group-title');
-  const tabsListElement = groupElement.querySelector('.group-tabs-list');
-  const tabsCountElement = groupElement.querySelector('.tabs-count');
+    const groupElement = template.content.cloneNode(true);
+    const groupItem = groupElement.querySelector('.groupelement');
+    groupItem.addEventListener('dragover', dragOverGroup);
+    groupItem.addEventListener('dragleave', dragLeaveGroup);
+    const groupTitleElement = groupElement.querySelector('.group-title');
+    const tabsListElement = groupElement.querySelector('.group-tabs-list');
+    const tabsCountElement = groupElement.querySelector('.tabs-count');
 
-  if (!groupTitleElement || !tabsListElement) {
-    console.error('Group title or tabs list element not found');
-    return null; // Exit if essential elements are not found
-  }
+    if (!groupTitleElement || !tabsListElement) {
+      console.error('Group title or tabs list element not found');
+      return null; // Exit if essential elements are not found
+    }
 
-  // Set the group title and ID
-  groupTitleElement.textContent = group.title || 'Unnamed Group';
-  tabsListElement.dataset.groupId = group.id;
+    // Set the group title and ID
+    groupTitleElement.textContent = group.title || 'Unnamed Group';
+    tabsListElement.dataset.groupId = group.id;
 
-  // Display the tab count inside the group
-  tabsCountElement.textContent = `${tabs.length} ${
-    tabs.length === 1 ? 'tab' : 'tabs'
-  }`;
+    // Display the tab count inside the group
+    tabsCountElement.textContent = `${tabs.length} ${
+      tabs.length === 1 ? 'tab' : 'tabs'
+    }`;
 
-  // Add event listener to toggle the accordion
-  groupElement
-    .querySelector('.toggle-button')
-    .addEventListener('click', toggleGroup);
+    // Add event listener to toggle the accordion
+    groupElement
+      .querySelector('.toggle-button')
+      .addEventListener('click', toggleGroup);
 
-  // Add event listener for editing group title
-  const editIcon = groupElement.querySelector('.group-edit-img');
-  if (!groupTitleElement || !tabsListElement) {
-    console.error('Group title or tabs list element not found');
-    return null; // Exit if essential elements are not found
-  }
+    // Add event listener for editing group title
+    const editIcon = groupElement.querySelector('.group-edit-img');
+    if (!groupTitleElement || !tabsListElement) {
+      console.error('Group title or tabs list element not found');
+      return null; // Exit if essential elements are not found
+    }
 
-  // Set the group title and ID
-  groupTitleElement.textContent = group.title || 'Unnamed Group';
-  tabsListElement.dataset.groupId = group.id;
-  editIcon.addEventListener('click', function () {
-    groupTitleElement.contentEditable = true;
-    groupTitleElement.focus();
+    // Set the group title and ID
+    groupTitleElement.textContent = group.title || 'Unnamed Group';
+    tabsListElement.dataset.groupId = group.id;
+    editIcon.addEventListener('click', function () {
+      groupTitleElement.contentEditable = true;
+      groupTitleElement.focus();
 
-    // Temporarily remove ellipsis while editing
-    groupTitleElement.style.whiteSpace = 'normal';
-    groupTitleElement.style.overflow = 'visible';
-    groupTitleElement.style.textOverflow = 'unset';
-  });
+      // Temporarily remove ellipsis while editing
+      groupTitleElement.style.whiteSpace = 'normal';
+      groupTitleElement.style.overflow = 'visible';
+      groupTitleElement.style.textOverflow = 'unset';
+    });
 
-  groupTitleElement.addEventListener('blur', async function () {
-    await updateGroupTitle(group.id, this.textContent);
-    this.contentEditable = false;
-
-    groupTitleElement.style.whiteSpace = 'nowrap';
-    groupTitleElement.style.overflow = 'hidden';
-    groupTitleElement.style.textOverflow = 'ellipsis';
-  });
-
-  groupTitleElement.addEventListener('keydown', async function (e) {
-    if (e.key === 'Enter') {
-      e.preventDefault();
+    groupTitleElement.addEventListener('blur', async function () {
       await updateGroupTitle(group.id, this.textContent);
       this.contentEditable = false;
-      this.blur();
 
       groupTitleElement.style.whiteSpace = 'nowrap';
       groupTitleElement.style.overflow = 'hidden';
       groupTitleElement.style.textOverflow = 'ellipsis';
+    });
+
+    groupTitleElement.addEventListener('keydown', async function (e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        await updateGroupTitle(group.id, this.textContent);
+        this.contentEditable = false;
+        this.blur();
+
+        groupTitleElement.style.whiteSpace = 'nowrap';
+        groupTitleElement.style.overflow = 'hidden';
+        groupTitleElement.style.textOverflow = 'ellipsis';
+      }
+    });
+
+    // Set the background color of the color-div to the group's color
+    const groupInfo = await chrome.tabGroups.get(group.id);
+
+    for (const tab of tabs) {
+      const tabElement = createTabElement(tab);
+      tabsListElement.appendChild(tabElement);
     }
-  });
 
-  // Set the background color of the color-div to the group's color
-  const groupInfo = await chrome.tabGroups.get(group.id);
+    // Make the tabs list element droppable
+    tabsListElement.addEventListener('dragover', allowDrop);
+    tabsListElement.addEventListener('drop', (event) => {
+      drop(event, selectedGroupIds);
+    });
 
-  for (const tab of tabs) {
-    const tabElement = createTabElement(tab);
-    tabsListElement.appendChild(tabElement);
+    return groupElement.firstElementChild; // Return the actual element
+  } catch (error) {
+    console.error('Error creating group element:', error);
   }
-
-  // Make the tabs list element droppable
-  tabsListElement.addEventListener('dragover', allowDrop);
-  tabsListElement.addEventListener('drop', (event) => {
-    drop(event, selectedGroupIds);
-  });
-
-  return groupElement.firstElementChild; // Return the actual element
 }
 
+// Handle dragging over the group item
 function dragOverGroup(event) {
   //   event.preventDefault();
 
@@ -187,6 +192,7 @@ function dragLeaveGroup(event) {
   }
 }
 
+// Function to toggle the group arcordion
 function toggleGroup() {
   const tabsList =
     this.closest('.group-item').querySelector('.group-tabs-list');
@@ -195,6 +201,7 @@ function toggleGroup() {
   this.textContent = isVisible ? '+' : '-'; // Change button icon
 }
 
+// Function to create a tab element
 function createTabElement(tab) {
   const tabElement = document.createElement('li');
   tabElement.classList.add('tabitem');
@@ -211,27 +218,31 @@ function createTabElement(tab) {
         <button class="tabclosebutton">x</button>
       </div>
     `;
+  try {
+    tabElement
+      .querySelector('.tabclosebutton')
+      .addEventListener('click', async function (e) {
+        e.stopPropagation(); // Prevent the tab from being activated when closing
+        await chrome.tabs.remove(tab.id);
+        tabElement.remove();
+      });
 
-  tabElement
-    .querySelector('.tabclosebutton')
-    .addEventListener('click', async function (e) {
-      e.stopPropagation(); // Prevent the tab from being activated when closing
-      await chrome.tabs.remove(tab.id);
-      tabElement.remove();
+    // Add event listener to activate the tab when clicked
+    tabElement.addEventListener('click', async () => {
+      await chrome.tabs.update(tab.id, { active: true });
+      await chrome.windows.update(tab.windowId, { focused: true });
     });
 
-  // Add event listener to activate the tab when clicked
-  tabElement.addEventListener('click', async () => {
-    await chrome.tabs.update(tab.id, { active: true });
-    await chrome.windows.update(tab.windowId, { focused: true });
-  });
+    // Add drag event listeners
+    tabElement.addEventListener('dragstart', drag);
 
-  // Add drag event listeners
-  tabElement.addEventListener('dragstart', drag);
-
-  return tabElement;
+    return tabElement;
+  } catch (error) {
+    console.error('Error creating tab element:', error);
+  }
 }
 
+// Function to group all tabs by domain
 export async function autoGroup(selectedGroupIds) {
   try {
     const tabs = await chrome.tabs.query({});
@@ -264,6 +275,7 @@ export async function autoGroup(selectedGroupIds) {
   }
 }
 
+// Function to move the selected tabs to the selected group
 function drag(ev) {
   ev.dataTransfer.setData(
     'text/plain',
@@ -271,10 +283,12 @@ function drag(ev) {
   );
 }
 
+// Function to allow dropping the tab
 function allowDrop(ev) {
   ev.preventDefault();
 }
 
+// Function to drop the tab into the group
 async function drop(ev, selectedGroupIds) {
   ev.preventDefault();
   const tabId = parseInt(ev.dataTransfer.getData('text'));
@@ -297,6 +311,7 @@ async function drop(ev, selectedGroupIds) {
   }
 }
 
+// Function to update the group title
 async function updateGroupTitle(groupId, newTitle) {
   try {
     await chrome.tabGroups.update(groupId, { title: newTitle });
@@ -305,39 +320,61 @@ async function updateGroupTitle(groupId, newTitle) {
   }
 }
 
+// Function to add a new group
 export async function addGroup(selectedGroupIds) {
   //create new chrome tab
-  await chrome.tabs.create(
-    {
-      url: 'chrome://newtab',
-      active: false,
-    },
-    async (tab) => {
-      await chrome.tabs.group({ tabIds: [tab.id] }, async (groupId) => {
-        await chrome.tabGroups.update(groupId, {
-          title: 'Unnamed Group',
-          collapsed: true,
+  try {
+    await chrome.tabs.create(
+      {
+        url: 'chrome://newtab',
+        active: false,
+      },
+      async (tab) => {
+        await chrome.tabs.group({ tabIds: [tab.id] }, async (groupId) => {
+          await chrome.tabGroups.update(groupId, {
+            title: 'Unnamed Group',
+            collapsed: true,
+          });
+          await displayTabGroups(selectedGroupIds);
         });
-        await displayTabGroups(selectedGroupIds);
-      });
-    }
-  );
+      }
+    );
+  } catch (error) {
+    console.error('Error adding new group:', error);
+  }
 }
 
+// Function to update the group element
 async function updateGroupElement(groupId, selectedGroupIds) {
   const groupElement = document.querySelector(`[data-group-id="${groupId}"]`);
   if (!groupElement) {
-    console.error(`Group element with ID ${groupId} not found`);
     return; // Exit if the group element is not found
   }
+  try {
+    const group = await chrome.tabGroups.get(groupId);
+    if (!group) {
+      return; // Exit if the group is not found
+    }
+    const updatedGroupElement = await createGroupElement(
+      group,
+      document.getElementById('group_template'),
+      selectedGroupIds
+    );
+    if (updatedGroupElement) {
+      groupElement.replaceWith(updatedGroupElement);
+    }
+  } catch (error) {}
+}
 
-  const group = await chrome.tabGroups.get(groupId);
-  const updatedGroupElement = await createGroupElement(
-    group,
-    document.getElementById('group_template'),
-    selectedGroupIds
-  );
-  if (updatedGroupElement) {
-    groupElement.replaceWith(updatedGroupElement);
+export async function createNewGroupWithSelectedTabs(selectedTabIds) {
+  try {
+    await chrome.tabs.group({ tabIds: selectedTabIds }, async (groupId) => {
+      await chrome.tabGroups.update(groupId, {
+        title: 'Unnamed Group',
+        collapsed: true,
+      });
+    });
+  } catch (error) {
+    console.error('Error creating new group:', error);
   }
 }
