@@ -35,7 +35,7 @@ By accessing or using Taabs, you agree to comply with and be bound by these Term
 - You agree to indemnify, defend, and hold harmless the author and its affiliates from and against any claims, liabilities, damages, losses, and expenses (including reasonable attorney fees) arising out of or in connection with your use of the extension or violation of these Terms.
 
 ## 10. Governing Law
-- These Terms shall be governed by and construed in accordance with the laws of [Your Jurisdiction]. Any disputes arising under or in connection with these Terms shall be subject to the exclusive jurisdiction of the courts of [Your Jurisdiction].
+- These Terms shall be governed by and construed in accordance with the laws the local state. Any disputes arising under or in connection with these Terms shall be subject to the exclusive jurisdiction of the courts of the local state.
 
 By continuing to use this extension, you acknowledge that you have read and understood these Terms.
 
