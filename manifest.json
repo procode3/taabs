@@ -22,7 +22,9 @@
         "tabs",
         "storage",
         "tabGroups",
-        "activeTab"
+        "activeTab",
+        "bookmarks",
+        "sessions"
     ] 
 
   }
