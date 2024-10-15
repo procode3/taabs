@@ -1,3 +1,5 @@
+import { switchSection } from './nav.js';
+
 let expandTimeout;
 let isGroupItemsExpanded = false;
 
@@ -366,15 +368,25 @@ async function updateGroupElement(groupId, selectedGroupIds) {
   } catch (error) {}
 }
 
-export async function createNewGroupWithSelectedTabs(selectedTabIds) {
+export async function createNewGroupWithSelectedTabs(
+  selectedTabIds,
+  selectedGroupIds
+) {
   try {
-    await chrome.tabs.group({ tabIds: selectedTabIds }, async (groupId) => {
-      await chrome.tabGroups.update(groupId, {
-        title: 'Unnamed Group',
-        collapsed: true,
-      });
-    });
+    await chrome.tabs.group(
+      { tabIds: Array.from(selectedTabIds) },
+      async (groupId) => {
+        await chrome.tabGroups.update(groupId, {
+          title: 'Unnamed Group',
+          collapsed: true,
+        });
+      }
+    );
   } catch (error) {
     console.error('Error creating new group:', error);
+  } finally {
+    await displayTabGroups(selectedGroupIds);
+    const groupSection = document.querySelector('.group-section');
+    switchSection(groupSection);
   }
 }

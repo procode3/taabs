@@ -5,6 +5,7 @@ import {
   deleteSelectedGroup,
   autoGroup,
   addGroup,
+  createNewGroupWithSelectedTabs,
 } from './controllers/group.js';
 
 import { filterTabs } from './controllers/search.js';
@@ -124,5 +125,11 @@ resetButton.addEventListener('click', () => {
 });
 
 const mergeWindowsButton = document.querySelector('.merge');
-
 mergeWindowsButton.addEventListener('click', mergeAllWindows);
+
+const addToNewGroup = document.querySelector('.group-btn');
+addToNewGroup.addEventListener(
+  'click',
+  async () =>
+    await createNewGroupWithSelectedTabs(selectedTabIds, selectedGroupIds)
+);
