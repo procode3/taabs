@@ -373,15 +373,7 @@ export async function createNewGroupWithSelectedTabs(
   selectedGroupIds
 ) {
   try {
-    await chrome.tabs.group(
-      { tabIds: Array.from(selectedTabIds) },
-      async (groupId) => {
-        await chrome.tabGroups.update(groupId, {
-          title: 'Unnamed Group',
-          collapsed: true,
-        });
-      }
-    );
+    await chrome.tabs.group({ tabIds: Array.from(selectedTabIds) });
   } catch (error) {
     console.error('Error creating new group:', error);
   } finally {
