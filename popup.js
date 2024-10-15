@@ -134,7 +134,7 @@ async function autoGroup() {
       const hostname = new URL(tab.url).hostname;
 
       // Remove subdomains (like 'www') and TLDs (like '.com')
-      const domain = hostname.split('.').slice(-2, -1)[0]; // Extract the second-to-last part of the hostname
+      const domain = hostname?.split('.').slice(-2, -1)[0] || 'Unnamed Group'; // Extract the second-to-last part of the hostname
 
       if (!groups[domain]) {
         groups[domain] = [];
@@ -145,7 +145,10 @@ async function autoGroup() {
     for (const domain in groups) {
       const tabIds = groups[domain];
       const group = await chrome.tabs.group({ tabIds });
-      await chrome.tabGroups.update(group, { title: domain, collapsed: true });
+      await chrome.tabGroups.update(group, {
+        title: domain || 'Unnamed Group',
+        collapsed: true,
+      });
     }
   } catch (error) {
     console.error('Error grouping tabs:', error);
@@ -217,6 +220,7 @@ async function displayTabGroups(openedGroupId = []) {
       if (openedGroupId.includes(group.id)) {
         groupElement.querySelector('.group-tabs-list').style.display = 'flex';
       }
+
       groupContainer.appendChild(groupElement);
     }
     print('groupContainer', groupContainer);
@@ -273,12 +277,15 @@ async function createGroupElement(group, template) {
     return null; // Exit if the template is not found
   }
 
+  const tabs = await chrome.tabs.query({ groupId: group.id });
+
   const groupElement = template.content.cloneNode(true);
   const groupItem = groupElement.querySelector('.groupelement');
   groupItem.addEventListener('dragover', dragOverGroup);
   groupItem.addEventListener('dragleave', dragLeaveGroup);
   const groupTitleElement = groupElement.querySelector('.group-title');
   const tabsListElement = groupElement.querySelector('.group-tabs-list');
+  const tabsCountElement = groupElement.querySelector('.tabs-count');
 
   if (!groupTitleElement || !tabsListElement) {
     console.error('Group title or tabs list element not found');
@@ -288,6 +295,11 @@ async function createGroupElement(group, template) {
   // Set the group title and ID
   groupTitleElement.textContent = group.title || 'Unnamed Group';
   tabsListElement.dataset.groupId = group.id;
+
+  // Display the tab count inside the group
+  tabsCountElement.textContent = `${tabs.length} ${
+    tabs.length === 1 ? 'tab' : 'tabs'
+  }`;
 
   // Add event listener to toggle the accordion
   groupElement
@@ -307,11 +319,20 @@ async function createGroupElement(group, template) {
   editIcon.addEventListener('click', function () {
     groupTitleElement.contentEditable = true;
     groupTitleElement.focus();
+
+    // Temporarily remove ellipsis while editing
+    groupTitleElement.style.whiteSpace = 'normal';
+    groupTitleElement.style.overflow = 'visible';
+    groupTitleElement.style.textOverflow = 'unset';
   });
 
   groupTitleElement.addEventListener('blur', async function () {
     await updateGroupTitle(group.id, this.textContent);
     this.contentEditable = false;
+
+    groupTitleElement.style.whiteSpace = 'nowrap';
+    groupTitleElement.style.overflow = 'hidden';
+    groupTitleElement.style.textOverflow = 'ellipsis';
   });
 
   groupTitleElement.addEventListener('keydown', async function (e) {
@@ -320,11 +341,15 @@ async function createGroupElement(group, template) {
       await updateGroupTitle(group.id, this.textContent);
       this.contentEditable = false;
       this.blur();
+
+      groupTitleElement.style.whiteSpace = 'nowrap';
+      groupTitleElement.style.overflow = 'hidden';
+      groupTitleElement.style.textOverflow = 'ellipsis';
     }
   });
 
-  // Get all tabs in the current group
-  const tabs = await chrome.tabs.query({ groupId: group.id });
+  // Set the background color of the color-div to the group's color
+  const groupInfo = await chrome.tabGroups.get(group.id);
 
   for (const tab of tabs) {
     const tabElement = createTabElement(tab);
