@@ -59,3 +59,33 @@ export async function displayTabs(tabs, selectedTabIds) {
   // Display the number of selected tabs
   selectedCountDisplay.textContent = `${selectedTabIds.size} selected`;
 }
+
+export async function mergeAllWindows() {
+  try {
+    const currentWindow = await chrome.windows.getCurrent();
+    const allWindows = await chrome.windows.getAll({ populate: true });
+
+    const promises = [];
+
+    for (const window of allWindows) {
+      if (window.id !== currentWindow.id) {
+        const tabIds = window.tabs.map((tab) => tab.id);
+
+        // Move tabs and capture the promise
+        promises.push(
+          chrome.tabs.move(tabIds, { windowId: currentWindow.id, index: -1 })
+        );
+
+        // Capture the promise to close the window after moving tabs
+        promises.push(chrome.windows.remove(window.id));
+      }
+    }
+
+    // Resolve all promises at once
+    await Promise.all(promises);
+
+    console.log('All windows merged into the current one');
+  } catch (error) {
+    console.error('Error merging windows:', error);
+  }
+}

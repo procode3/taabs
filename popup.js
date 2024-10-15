@@ -9,7 +9,7 @@ import {
 
 import { filterTabs } from './controllers/search.js';
 
-import { displayTabs } from './controllers/tab.js';
+import { displayTabs, mergeAllWindows } from './controllers/tab.js';
 
 // Initialize the navigation
 initNavigation();
@@ -68,7 +68,7 @@ closeSelectedButton.addEventListener('click', async () => {
   displayTabs(tabs, selectedTabIds);
 });
 
-const button = document.querySelector('.group-btn');
+const button = document.querySelector('.autogroup');
 button.addEventListener('click', () => autoGroup(selectedGroupIds));
 
 // On page load, get the current state of lazy loading from storage
@@ -125,10 +125,4 @@ resetButton.addEventListener('click', () => {
 
 const mergeWindowsButton = document.querySelector('.merge');
 
-mergeWindowsButton.addEventListener('click', () => {
-  chrome.windows.getAll({ populate: true }, (windows) => {
-    const tabs = windows.flatMap((window) => window.tabs);
-    const tabIds = tabs.map((tab) => tab.id);
-    chrome.tabs.remove(tabIds);
-  });
-});
+mergeWindowsButton.addEventListener('click', mergeAllWindows);

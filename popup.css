@@ -148,7 +148,7 @@ body {
 }
 
 .settings-icon:hover, .home-icon:hover, .group-icon:hover, .footer-btn:hover, .grouptabs-icon:hover, .delete-icon:hover  {
-  filter: brightness(0) saturate(100%) invert(16%) sepia(70%) saturate(3066%) hue-rotate(217deg) brightness(90%) contrast(93%);
+  filter: brightness(1) saturate(100%) invert(16%) sepia(70%) saturate(3066%) hue-rotate(217deg) brightness(90%) contrast(93%);
   transition: transform 0.3s ease-in-out, filter 0.3s ease; 
 }
 
@@ -181,10 +181,35 @@ body {
 }
 
 .actions {
+  margin-top: 10px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 5px;
+}
+
+.actions-new {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  gap: 2px;
+}
+
+.actions-new > img {
+  width: 26px;
+  height: 26px;
+  transition: all 0.3s ease;
+  cursor: pointer; 
+}
+
+.actions-new > span, .actions-title {
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+.actions-new > span:hover {
+  cursor: pointer; 
 }
 
 .tab-input {
@@ -243,7 +268,7 @@ body {
 
 .description {
   font-size: 10px;
-  color: #666;
+  color: rgb(41, 17, 3);
 }
 
 input:checked + .toggle-slider {
@@ -331,7 +356,7 @@ input:checked + .toggle-slider:before {
   font-weight: 500;
 }
 
-.settings-item > button {
+.settings-item > button, .actions > button {
   background-color: #172554; 
   color: white; 
   border: none;
@@ -343,7 +368,7 @@ input:checked + .toggle-slider:before {
   transition: background-color 0.3s ease;
 }
 
-.settings-item > button:hover {
+.settings-item > button:hover, .actions > button:hover {
   background-color: #657ecc;
 }
 
