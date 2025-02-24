@@ -70,6 +70,6 @@ This Privacy Policy explains how Taabs collects, uses, and protects your informa
 - The extension is not intended for use by children under the age of 13. We do not knowingly collect personal information from children under 13. If you are a parent or guardian and believe that your child has provided us with personal information, please contact us.
 
 ## 7. Contact Us
-- If you have any questions or concerns regarding these Terms of Service or our Privacy Policy, please contact us at [your contact information].
+- If you have any questions or concerns regarding these Terms of Service or our Privacy Policy, please contact us at wr.t8r1@gmail.com.
 
 By using the extension, you acknowledge that you have read and understood this Privacy Policy.
